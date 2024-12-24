@@ -64,7 +64,7 @@ This project is a Python-based application designed to process geometric shapes,
 
 1. Clone the repository:
    ```bash
-   git clone <repository_url>
+   git clone https://github.com/siaserb/DiversiPy-shape-calculator.git
    cd <repository_folder>
    ```
    
