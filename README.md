@@ -68,10 +68,10 @@ This project is a Python-based application designed to process geometric shapes,
    cd <repository_folder>
    ```
    
-2. Create annd activate a virtual environment:
+2. Create annd activate a virtual environment on Linux:
    ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\\Scripts\\activate
+   python3 -m venv venv
+   source venv/bin/activate
    ```
 
 3. Run the main program:
