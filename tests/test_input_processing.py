@@ -27,7 +27,7 @@ class TestProceedShapesParametres(unittest.TestCase):
         self.assertEqual(result, {"side_length": 4.0})
 
     def test_square_invalid_side(self):
-        with self.assertRaises(Exception) as context:
+        with self.assertRaises(ValueError) as context:
             proceed_shapes_parametres("Side -4", "square")
         self.assertEqual(
             str(context.exception),
@@ -35,7 +35,7 @@ class TestProceedShapesParametres(unittest.TestCase):
         )
 
     def test_square_not_full_info(self):
-        with self.assertRaises(Exception) as context:
+        with self.assertRaises(ValueError) as context:
             proceed_shapes_parametres("", "square")
         self.assertEqual(
             str(context.exception),
@@ -68,7 +68,7 @@ class TestProceedShapesParametres(unittest.TestCase):
         self.assertEqual(result, {"side1_length": 6.0, "side2_length": 5.0})
 
     def test_rectangle_invalid_side(self):
-        with self.assertRaises(Exception) as context:
+        with self.assertRaises(ValueError) as context:
             proceed_shapes_parametres("Side1 4 Side2 -5", "rectangle")
         self.assertEqual(
             str(context.exception),
@@ -76,7 +76,7 @@ class TestProceedShapesParametres(unittest.TestCase):
         )
 
     def test_rectangle_not_full_info(self):
-        with self.assertRaises(Exception) as context:
+        with self.assertRaises(ValueError) as context:
             proceed_shapes_parametres("", "rectangle")
         self.assertEqual(
             str(context.exception),
@@ -88,11 +88,14 @@ class TestProceedShapesParametres(unittest.TestCase):
             "Side1 4 Side2 6 AngleBetweenSidesDegrees 45",
             "parallelogram"
         )
-        self.assertEqual(result, {
-            "side1_length": 4.0,
-            "side2_length": 6.0,
-            "angle_between_sides_degrees": 45.0
-        })
+        self.assertEqual(
+            result,
+            {
+                "side1_length": 4.0,
+                "side2_length": 6.0,
+                "angle_between_sides_degrees": 45.0
+            }
+        )
 
     def test_parallelogram_invalid_angle(self):
         with self.assertRaises(ValueError) as context:
@@ -109,10 +112,13 @@ class TestProceedShapesParametres(unittest.TestCase):
             "Side 4 AngleBetweenSidesDegrees 30",
             "rhombus"
         )
-        self.assertEqual(result, {
-            "side_length": 4.0,
-            "angle_between_sides_degrees": 30.0
-        })
+        self.assertEqual(
+            result,
+            {
+                "side_length": 4.0,
+                "angle_between_sides_degrees": 30.0
+            }
+        )
 
     def test_rhombus_invalid_angle(self):
         with self.assertRaises(ValueError) as context:
@@ -130,11 +136,14 @@ class TestProceedShapesParametres(unittest.TestCase):
             "Side1 3 Side2 4 Side3 5",
             "triangle"
         )
-        self.assertEqual(result, {
-            "side1_length": 3.0,
-            "side2_length": 4.0,
-            "side3_length": 5.0
-        })
+        self.assertEqual(
+            result,
+            {
+                "side1_length": 3.0,
+                "side2_length": 4.0,
+                "side3_length": 5.0
+            }
+        )
 
     def test_triangle_with_points(self):
         result = proceed_shapes_parametres(
@@ -151,7 +160,7 @@ class TestProceedShapesParametres(unittest.TestCase):
         )
 
     def test_triangle_invalid_side(self):
-        with self.assertRaises(Exception) as context:
+        with self.assertRaises(ValueError) as context:
             proceed_shapes_parametres("Side1 3 Side2 4 Side3 -5", "triangle")
         self.assertEqual(
             str(context.exception),
@@ -159,7 +168,7 @@ class TestProceedShapesParametres(unittest.TestCase):
         )
 
     def test_triangle_not_full_info(self):
-        with self.assertRaises(Exception) as context:
+        with self.assertRaises(ValueError) as context:
             proceed_shapes_parametres("", "triangle")
         self.assertEqual(
             str(context.exception),
@@ -171,46 +180,62 @@ class TestProceedShapesParametres(unittest.TestCase):
         self.assertEqual(result, {"radius": 5.0})
 
     def test_circle_invalid_radius(self):
-        with self.assertRaises(Exception) as context:
+        with self.assertRaises(ValueError) as context:
             proceed_shapes_parametres("Radius -5", "circle")
         self.assertEqual(str(context.exception), "Radius must be positive")
 
     def test_invalid_shape_type(self):
-        with self.assertRaises(Exception) as context:
+        with self.assertRaises(ValueError) as context:
             proceed_shapes_parametres("Side 5", "unknown")
         self.assertEqual(
             str(context.exception),
-            "Lack of information about unknown or incorrect format"
+            "Lack of information about Unknown or incorrect format"
         )
 
 
 class TestCollectShapes(unittest.TestCase):
 
-    @patch("builtins.input", side_effect=[
-        "square", "Side 4",
-        "circle", "Radius 5",
-        "triangle", "Side1 3 Side2 4 Side3 5",
-        "stop"
-    ])
+    @patch(
+        "builtins.input",
+        side_effect=[
+            "square",
+            "Side 4",
+            "circle",
+            "Radius 5",
+            "triangle",
+            "Side1 3 Side2 4 Side3 5",
+            "stop"
+        ]
+    )
     def test_collect_shapes_valid_inputs(self, mock_input):
         result = collect_shapes()
         self.assertEqual(len(result), 3)
-        self.assertEqual(result[0], {
-            "shape_name": "square",
-            "side_length": 4.0
-        })
+        self.assertEqual(
+            result[0],
+            {
+                "shape_name": "square",
+                "side_length": 4.0
+            }
+        )
         self.assertEqual(result[1], {"shape_name": "circle", "radius": 5.0})
-        self.assertEqual(result[2], {
-            "shape_name": "triangle",
-            "side1_length": 3.0,
-            "side2_length": 4.0,
-            "side3_length": 5.0
-        })
+        self.assertEqual(
+            result[2],
+            {
+                "shape_name": "triangle",
+                "side1_length": 3.0,
+                "side2_length": 4.0,
+                "side3_length": 5.0
+            }
+        )
 
-    @patch("builtins.input", side_effect=[
-        "rectangle", "Side1 4 Side2 -5",
-        "stop"
-    ])
+    @patch(
+        "builtins.input",
+        side_effect=[
+            "rectangle",
+            "Side1 4 Side2 -5",
+            "stop"
+        ]
+    )
     def test_collect_shapes_invalid_input(self, mock_input):
         with patch("builtins.print") as mock_print:
             result = collect_shapes()
@@ -219,10 +244,14 @@ class TestCollectShapes(unittest.TestCase):
                 "Error processing parameters: Side length must be positive"
             )
 
-    @patch("builtins.input", side_effect=[
-        "invalid_shape", "",
-        "stop"
-    ])
+    @patch(
+        "builtins.input",
+        side_effect=[
+            "invalid_shape",
+            "",
+            "stop"
+        ]
+    )
     def test_collect_shapes_invalid_shape_type(self, mock_input):
         with patch("builtins.print") as mock_print:
             result = collect_shapes()

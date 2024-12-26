@@ -2,13 +2,13 @@ def distance_between_points(point1: tuple, point2: tuple) -> float:
     length_of_point1 = len(point1)
     length_of_point2 = len(point2)
     if length_of_point1 != 2 or length_of_point2 != 2:
-        raise Exception("Points must be in 2D")
+        raise ValueError("Points must be in 2D")
     for number1, number2 in zip(point1, point2):
         if (
                 not isinstance(number1, (int, float))
                 or not isinstance(number2, (int, float))
         ):
-            raise Exception(
+            raise ValueError(
                 "Points must be numbers"
             )
     return ((point1[0] - point2[0]) ** 2 + (point1[1] - point2[1]) ** 2) ** 0.5
@@ -19,14 +19,18 @@ def is_adjacent(name_of_angle1: str, name_of_angle2: str) -> bool:
 
     positions = ("topleft", "topright", "bottomright", "bottomleft")
     if name_of_angle1 not in positions or name_of_angle2 not in positions:
-        raise Exception("Angles must be in the following positions: "
-                        "TopLeft, TopRight, BottomRight, BottomLeft")
-    return (names_of_angles in (
-        {positions[0], positions[1]},
-        {positions[1], positions[2]},
-        {positions[2], positions[3]},
-        {positions[3], positions[0]}
-    ))
+        raise ValueError(
+            "Angles must be in the following positions: "
+            "TopLeft, TopRight, BottomRight, BottomLeft"
+        )
+    return (
+        names_of_angles in (
+            {positions[0], positions[1]},
+            {positions[1], positions[2]},
+            {positions[2], positions[3]},
+            {positions[3], positions[0]}
+        )
+    )
 
 
 def calculate_sides_from_points(

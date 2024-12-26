@@ -27,20 +27,22 @@ def proceed_shapes_parametres(shape_info: str, shape_type: str) -> dict:
         if "side" in shape_info:
             side_length = get_value("side")
             if side_length <= 0:
-                raise Exception("Side length must be positive")
+                raise ValueError("Side length must be positive")
             shape_params.update({"side_length": side_length})
 
         elif len(angles) >= 2:
             point1, point2 = get_coordinates([angles[0], angles[1]]).values()
             if is_adjacent(angles[0], angles[1]):
                 shape_params.update(
-                    {"side_length": distance_between_points(point1, point2)}
+                    {
+                        "side_length": distance_between_points(point1, point2)
+                    }
                 )
             else:
                 side_length = calculate_sides_from_points(point1, point2)
                 shape_params.update({"side_length": side_length})
         else:
-            raise Exception(
+            raise ValueError(
                 "Lack of information about Square or incorrect format"
             )
 
@@ -51,7 +53,7 @@ def proceed_shapes_parametres(shape_info: str, shape_type: str) -> dict:
         if "side1" in shape_info and "side2" in shape_info:
             side1_length, side2_length = get_value("side1"), get_value("side2")
             if side1_length <= 0 or side2_length <= 0:
-                raise Exception("Side length must be positive")
+                raise ValueError("Side length must be positive")
             shape_params.update(
                 {
                     "side1_length": side1_length,
@@ -76,19 +78,23 @@ def proceed_shapes_parametres(shape_info: str, shape_type: str) -> dict:
                 )
 
                 shape_params.update(
-                    {"side1_length": side1_length,
-                     "side2_length": side2_length}
+                    {
+                        "side1_length": side1_length,
+                        "side2_length": side2_length
+                    }
                 )
         else:
-            raise Exception(
+            raise ValueError(
                 "Lack of information about Rectangle or incorrect format"
             )
 
     elif (
         shape_type == "parallelogram"
-        and all(key in shape_info for key in (
-            "side1", "side2", "anglebetweensidesdegrees"
-        ))
+        and all(
+            key in shape_info for key in (
+                "side1", "side2", "anglebetweensidesdegrees"
+            )
+        )
     ):
         side1_length, side2_length, angle = map(
             get_value,
@@ -106,9 +112,11 @@ def proceed_shapes_parametres(shape_info: str, shape_type: str) -> dict:
 
     elif (
         shape_type == "rhombus"
-        and all(key in shape_info for key in (
-            "side", "anglebetweensidesdegrees"
-        ))
+        and all(
+            key in shape_info for key in (
+                "side", "anglebetweensidesdegrees"
+            )
+        )
     ):
         side_length, angle = map(
             get_value,
@@ -117,12 +125,18 @@ def proceed_shapes_parametres(shape_info: str, shape_type: str) -> dict:
         if min(side_length, angle) <= 0:
             raise ValueError("Side lengths and angle must be positive")
         shape_params.update(
-            {"side_length": side_length, "angle_between_sides_degrees": angle})
+            {
+                "side_length": side_length,
+                "angle_between_sides_degrees": angle
+            }
+        )
 
     elif shape_type == "triangle":
-        if all(point in shape_info for point in [
-            "point1", "point2", "point3"
-        ]):
+        if all(
+            point in shape_info for point in [
+                "point1", "point2", "point3"
+            ]
+        ):
             coordinates = get_coordinates(["point1", "point2", "point3"])
             side_lengths = {
                 f"side{i + 1}_length": (
@@ -141,26 +155,29 @@ def proceed_shapes_parametres(shape_info: str, shape_type: str) -> dict:
             if any(side <= 0 for side in [
                 side1_length, side2_length, side3_length
             ]):
-                raise Exception("Side length must be positive")
-            shape_params.update({
-                "side1_length": side1_length,
-                "side2_length": side2_length,
-                "side3_length": side3_length
-            })
+                raise ValueError("Side length must be positive")
+            shape_params.update(
+                {
+                    "side1_length": side1_length,
+                    "side2_length": side2_length,
+                    "side3_length": side3_length
+                }
+            )
         else:
-            raise Exception(
+            raise ValueError(
                 "Lack of information about Triangle or incorrect format"
             )
 
     elif shape_type == "circle" and "radius" in shape_info:
         radius = get_value("radius")
         if radius <= 0:
-            raise Exception("Radius must be positive")
+            raise ValueError("Radius must be positive")
         shape_params.update({"radius": radius})
 
     else:
-        raise Exception(
-            f"Lack of information about {shape_type} or incorrect format"
+        raise ValueError(
+            f"Lack of information about {shape_type.capitalize()} "
+            f"or incorrect format"
         )
 
     return shape_params
@@ -209,7 +226,7 @@ def collect_shapes() -> list[dict]:
         shape_info = input(f"Enter {available_shapes[shape_type]}: ").strip()
         try:
             shape_params = proceed_shapes_parametres(shape_info, shape_type)
-        except Exception as e:
+        except ValueError as e:
             print(f"Error processing parameters: {e}")
             continue
 

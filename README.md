@@ -103,5 +103,5 @@ python -m unittest discover tests
 
 ## Error Handling
 
-- Invalid shape inputs raise descriptive exceptions (e.g., "Side length must be positive").
+- Invalid shape inputs raise descriptive ValueErrors (e.g., "Side length must be positive").
 - Incorrect formats or unsupported shapes are handled gracefully.
