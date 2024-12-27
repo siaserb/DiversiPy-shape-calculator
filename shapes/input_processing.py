@@ -5,33 +5,32 @@ from shapes.utils import (
 )
 
 
+def get_value(key: str, shape_info: list[str]) -> float:
+    return float(shape_info[shape_info.index(key) + 1])
+
+
+def get_coordinates(keys: list, shape_info:list[str]) -> dict:
+    return {
+        key: (float(shape_info[shape_info.index(key) + 1]),
+              float(shape_info[shape_info.index(key) + 2]))
+        for key in keys
+    }
+
 def proceed_shapes_parametres(shape_info: str, shape_type: str) -> dict:
     shape_params = {}
-    shape_info = shape_info.lower().split()
-
     positions = ("topright", "bottomright", "bottomleft", "topleft")
-
-    def get_value(key: str) -> float:
-        return float(shape_info[shape_info.index(key) + 1])
-
-    def get_coordinates(keys: list) -> dict:
-        return {
-            key: (float(shape_info[shape_info.index(key) + 1]),
-                  float(shape_info[shape_info.index(key) + 2]))
-            for key in keys
-        }
-
+    shape_info = shape_info.lower().split()
     if shape_type == "square":
         angles = [angle for angle in positions if angle in shape_info]
 
         if "side" in shape_info:
-            side_length = get_value("side")
+            side_length = get_value("side", shape_info)
             if side_length <= 0:
                 raise ValueError("Side length must be positive")
             shape_params.update({"side_length": side_length})
 
         elif len(angles) >= 2:
-            point1, point2 = get_coordinates([angles[0], angles[1]]).values()
+            point1, point2 = get_coordinates([angles[0], angles[1]], shape_info).values()
             if is_adjacent(angles[0], angles[1]):
                 shape_params.update(
                     {
@@ -51,7 +50,7 @@ def proceed_shapes_parametres(shape_info: str, shape_type: str) -> dict:
         angles = [angle for angle in positions if angle in shape_info]
 
         if "side1" in shape_info and "side2" in shape_info:
-            side1_length, side2_length = get_value("side1"), get_value("side2")
+            side1_length, side2_length = get_value("side1", shape_info), get_value("side2", shape_info)
             if side1_length <= 0 or side2_length <= 0:
                 raise ValueError("Side length must be positive")
             shape_params.update(
@@ -64,12 +63,12 @@ def proceed_shapes_parametres(shape_info: str, shape_type: str) -> dict:
         elif len(angles) >= 2:
             coordinates = 0
             if not is_adjacent(angles[0], angles[1]):
-                coordinates = get_coordinates([angles[0], angles[1]])
+                coordinates = get_coordinates([angles[0], angles[1]], shape_info)
             elif len(angles) > 2:
                 if not is_adjacent(angles[0], angles[2]):
-                    coordinates = get_coordinates([angles[0], angles[2]])
+                    coordinates = get_coordinates([angles[0], angles[2]], shape_info)
                 else:
-                    coordinates = get_coordinates([angles[1], angles[2]])
+                    coordinates = get_coordinates([angles[1], angles[2]], shape_info)
             if coordinates:
                 point1, point2 = coordinates.values()
                 side1_length, side2_length = calculate_sides_from_points(
@@ -96,10 +95,10 @@ def proceed_shapes_parametres(shape_info: str, shape_type: str) -> dict:
             )
         )
     ):
-        side1_length, side2_length, angle = map(
-            get_value,
-            ("side1", "side2", "anglebetweensidesdegrees")
-        )
+
+        side1_length = get_value("side1", shape_info)
+        side2_length = get_value("side2", shape_info)
+        angle = get_value("anglebetweensidesdegrees", shape_info)
         if min(side1_length, side2_length, angle) <= 0:
             raise ValueError("Side lengths and angle must be positive")
         shape_params.update(
@@ -118,10 +117,8 @@ def proceed_shapes_parametres(shape_info: str, shape_type: str) -> dict:
             )
         )
     ):
-        side_length, angle = map(
-            get_value,
-            ("side", "anglebetweensidesdegrees")
-        )
+        side_length = get_value("side", shape_info)
+        angle = get_value("anglebetweensidesdegrees", shape_info)
         if min(side_length, angle) <= 0:
             raise ValueError("Side lengths and angle must be positive")
         shape_params.update(
@@ -137,7 +134,7 @@ def proceed_shapes_parametres(shape_info: str, shape_type: str) -> dict:
                 "point1", "point2", "point3"
             ]
         ):
-            coordinates = get_coordinates(["point1", "point2", "point3"])
+            coordinates = get_coordinates(["point1", "point2", "point3"], shape_info)
             side_lengths = {
                 f"side{i + 1}_length": (
                     distance_between_points(
@@ -150,7 +147,7 @@ def proceed_shapes_parametres(shape_info: str, shape_type: str) -> dict:
             shape_params.update(side_lengths)
         elif all(side in shape_info for side in ["side1", "side2", "side3"]):
             side1_length, side2_length, side3_length = (
-                get_value("side1"), get_value("side2"), get_value("side3")
+                get_value("side1", shape_info), get_value("side2", shape_info), get_value("side3", shape_info)
             )
             if any(side <= 0 for side in [
                 side1_length, side2_length, side3_length
@@ -169,7 +166,7 @@ def proceed_shapes_parametres(shape_info: str, shape_type: str) -> dict:
             )
 
     elif shape_type == "circle" and "radius" in shape_info:
-        radius = get_value("radius")
+        radius = get_value("radius", shape_info)
         if radius <= 0:
             raise ValueError("Radius must be positive")
         shape_params.update({"radius": radius})
