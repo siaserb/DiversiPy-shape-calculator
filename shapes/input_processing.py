@@ -16,34 +16,45 @@ def get_coordinates(keys: list, shape_info:list[str]) -> dict:
         for key in keys
     }
 
+
+def proceed_square_parametres(square_info_list: list[str]) -> dict:
+    shape_params = {}
+    positions = ("topright", "bottomright", "bottomleft", "topleft")
+
+    angles = [angle for angle in positions if angle in square_info_list]
+
+    if "side" in square_info_list:
+        square_side_length = get_value("side", square_info_list)
+        if square_side_length <= 0:
+            raise ValueError("Side length must be positive")
+        shape_params.update({"side_length": square_side_length})
+
+    elif len(angles) >= 2:
+        point1, point2 = get_coordinates([angles[0], angles[1]], square_info_list).values()
+        if is_adjacent(angles[0], angles[1]):
+            shape_params.update(
+                {
+                    "side_length": distance_between_points(point1, point2)
+                }
+            )
+        else:
+            square_side_length = calculate_sides_from_points(point1, point2)
+            shape_params.update({"side_length": square_side_length})
+    else:
+        raise ValueError(
+            "Lack of information about Square or incorrect format"
+        )
+
+    return shape_params
+
+
 def proceed_shapes_parametres(shape_info: str, shape_type: str) -> dict:
     shape_params = {}
     positions = ("topright", "bottomright", "bottomleft", "topleft")
     shape_info = shape_info.lower().split()
     if shape_type == "square":
-        angles = [angle for angle in positions if angle in shape_info]
-
-        if "side" in shape_info:
-            side_length = get_value("side", shape_info)
-            if side_length <= 0:
-                raise ValueError("Side length must be positive")
-            shape_params.update({"side_length": side_length})
-
-        elif len(angles) >= 2:
-            point1, point2 = get_coordinates([angles[0], angles[1]], shape_info).values()
-            if is_adjacent(angles[0], angles[1]):
-                shape_params.update(
-                    {
-                        "side_length": distance_between_points(point1, point2)
-                    }
-                )
-            else:
-                side_length = calculate_sides_from_points(point1, point2)
-                shape_params.update({"side_length": side_length})
-        else:
-            raise ValueError(
-                "Lack of information about Square or incorrect format"
-            )
+        shape_params.update(proceed_square_parametres(shape_info))
+        return shape_params
 
     elif shape_type == "rectangle":
 
